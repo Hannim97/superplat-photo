@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>SuperPlat | Photo</title>
+
+    <!-- 첫 페인트 전에 테마 적용 (다크 모드 사용자 흰 화면 깜빡임 방지). src/theme/theme.ts 와 같은 규칙 -->
+    <script>
+      (function () {
+        var mode = "system";
+        try {
+          var v = localStorage.getItem("superplat-theme");
+          if (v === "light" || v === "dark" || v === "system") mode = v;
+        } catch (e) {}
+        var dark =
+          mode === "dark" ||
+          (mode === "system" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        var t = dark ? "dark" : "light";
+        var root = document.documentElement;
+        root.setAttribute("data-theme", t);
+        root.style.colorScheme = t;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", dark ? "#202027" : "#FFFFFF");
+      })();
+    </script>
+
+    <!-- 공식 S 아이콘 (OS 테마에 따라 전환) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-light.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-dark.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>사진을 보려면 JavaScript를 켜 주세요.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

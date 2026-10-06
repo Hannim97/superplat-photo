@@ -1,0 +1,298 @@
+/* =========================================================
+   SuperPlat Photo — tokens
+   색·간격·라운드·모션 규율은 toss.md 를 참고해 SuperPlat 용으로 재구성
+   ========================================================= */
+/*
+ * 폰트: Pretendard 를 자체 호스팅하면 그대로 적용된다. (설치 방법은 README 참고)
+ * 미설치 시 iOS 는 Apple SD Gothic Neo, Android 는 시스템 서체로 표시된다.
+ */
+/* ---------- Light (기본) ---------- */
+:root {
+  --page-bg: #FFFFFF;
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F9FAFB;
+  --surface-strong: #F2F4F6;
+  --text-primary: #191F28;
+  --text-secondary: #4E5968;
+  --text-tertiary: #6B7684;
+  --border-default: #E5E8EB;
+  --accent-primary: #3182F6;
+  --accent-weak: #E8F3FF;
+  --accent-pressed: #1B64DA;     /* 확장: 버튼 pressed */
+  --on-accent: #FFFFFF;
+  --shadow-float: 0 2px 12px rgba(0, 23, 51, 0.08);
+
+  /* 컴포넌트 alias: semantic token 만 참조 */
+  --expiry-label: var(--text-tertiary);
+  --hint-text: var(--text-tertiary);
+  --photo-border: var(--border-default);
+  --photo-placeholder: var(--surface-primary);   /* 흰 면 + 사진과 같은 1px 테두리 → 로드 전후 프레임 동일 */
+  --placeholder-text: var(--text-tertiary);
+  --result-icon-bg: var(--surface-strong);
+  --segment-track: var(--surface-strong);
+  --segment-thumb: var(--surface-primary);
+
+  --s-4: 4px; --s-6: 6px; --s-8: 8px; --s-12: 12px; --s-16: 16px; --s-20: 20px; --s-24: 24px;
+  --s-28: 28px; --s-32: 32px; --s-40: 40px; --s-48: 48px; --s-64: 64px;
+  --r-s: 8px; --r-m: 12px; --r-btn: 14px; --r-l: 16px; --r-xl: 20px; --r-xxl: 24px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 120ms; --dur-base: 200ms;
+
+  --gutter: var(--s-24);
+  --header-h: 56px;
+  --wordmark-w: 86px;            /* 865×256 원본 비율 → 약 25px 높이 */
+  --logo-photo-gap: var(--s-24); /* 로고 하단 → 사진 상단 */
+  --photo-gap: var(--s-24);      /* 사진 → QR 유효 시간 */
+  /* 세로 사진도 유효 시간·안내와 함께 첫 화면에 들어오도록 사진 높이 상한 */
+  --photo-max-h: max(260px, calc(100vh - 230px));
+
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/*
+ * ---------- Dark ----------
+ * toss.md 의 dark palette 를 참고한 SuperPlat 프로젝트 토큰 (공식 Toss dark alias 재현 아님)
+ * html[data-theme] 은 <head> 인라인 스크립트가 첫 페인트 전에 설정한다.
+ */
+:root[data-theme="dark"] {
+  --page-bg: #202027;
+  --surface-primary: #202027;
+  --surface-secondary: #2C2C35;
+  --surface-strong: #3C3C47;
+  --text-primary: #FFFFFF;
+  --text-secondary: #C3C3C6;
+  --text-tertiary: #9E9EA4;
+  --border-default: #3C3C47;
+  --accent-primary: #3485FA;
+  --accent-weak: #202C4D;
+  --accent-pressed: #2272EB;
+  --shadow-float: 0 2px 12px rgba(0, 0, 0, 0.32);
+  --expiry-label: var(--text-secondary);      /* 다크에서 label 이 흐려지지 않게 한 단계 밝게 */
+  --photo-placeholder: var(--surface-secondary);
+  --result-icon-bg: var(--surface-secondary);
+  --segment-track: var(--surface-secondary);
+  --segment-thumb: var(--surface-strong);
+  color-scheme: dark;
+}
+/* 스크립트가 실행되지 않는 환경의 폴백 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --page-bg: #202027; --surface-primary: #202027; --surface-secondary: #2C2C35; --surface-strong: #3C3C47;
+    --text-primary: #FFFFFF; --text-secondary: #C3C3C6; --text-tertiary: #9E9EA4;
+    --border-default: #3C3C47; --accent-primary: #3485FA; --accent-weak: #202C4D; --accent-pressed: #2272EB;
+    --shadow-float: 0 2px 12px rgba(0, 0, 0, 0.32);
+    --expiry-label: var(--text-secondary); --photo-placeholder: var(--surface-secondary);
+    --result-icon-bg: var(--surface-secondary); --segment-track: var(--surface-secondary); --segment-thumb: var(--surface-strong);
+    color-scheme: dark;
+  }
+}
+
+@supports (height: 100dvh) { :root { --photo-max-h: max(260px, calc(100dvh - 230px)); } }
+@media (max-width: 390px) { :root { --gutter: var(--s-20); } }
+@media (min-width: 1024px) { :root { --wordmark-w: 100px; } }
+@media (min-width: 768px) {
+  :root { --photo-gap: var(--s-32); --photo-max-h: max(320px, calc(100dvh - 290px)); }
+}
+
+/*
+ * ---------- Theme 전환 ----------
+ * 전환하는 순간에만 색 속성을 200ms 로 보간. 사진(<img>)은 제외 → 깜빡임·재로딩 없음
+ */
+.theme-switching body,
+.theme-switching body *:not(img) {
+  transition: background-color var(--dur-base) var(--ease), color var(--dur-base) var(--ease),
+    border-color var(--dur-base) var(--ease), fill var(--dur-base) var(--ease) !important;
+}
+
+/* =========================================================
+   Base
+   길게 누르기 저장을 위해 페이지 어디에도 user-select: none,
+   -webkit-touch-callout: none, pointer-events: none 을 두지 않는다.
+   ========================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0; height: 100%;
+  background: var(--page-bg); color: var(--text-primary);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Noto Sans KR", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px; font-weight: 400; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  word-break: keep-all; overflow-wrap: anywhere;
+}
+#root { min-height: 100%; display: flex; flex-direction: column; }
+p, h1, dl, dd { margin: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+
+/* =========================================================
+   Layout
+   ========================================================= */
+.page {
+  flex: 1; display: flex; flex-direction: column; width: 100%;
+  padding: 0 max(var(--gutter), env(safe-area-inset-right, 0px)) var(--s-48) max(var(--gutter), env(safe-area-inset-left, 0px));
+}
+/* 하나의 세로 그리드: 폭 = 현재 사진의 표시 폭(최대 720px). 로고·사진·정보가 같은 좌우 끝을 공유 */
+.column {
+  flex: 1; display: flex; flex-direction: column;
+  width: min(100%, 720px, calc(var(--photo-max-h) * var(--ratio, 1.7778)));
+  margin: 0 auto;
+}
+.main {
+  flex: 1; display: flex; flex-direction: column;
+  /* 헤더(56px) 안에서 로고 아래 남는 공간을 빼서, 로고→사진 간격이 정확히 --logo-photo-gap 이 되게 */
+  padding-top: calc(var(--logo-photo-gap) - (var(--header-h) - var(--wordmark-w) * 256 / 865) / 2);
+}
+@media (min-width: 1024px) {
+  /* 데스크톱: 로고·사진·정보 묶음 전체를 화면 중앙에 (로고와 사진 간격은 모바일과 같은 리듬 유지) */
+  .page { justify-content: center; padding-top: var(--s-32); padding-bottom: var(--s-64); }
+  .column { flex: 0 0 auto; }
+  .main { flex: 0 0 auto; }
+}
+
+/* ---------- Header ---------- */
+.header { height: var(--header-h); display: flex; align-items: center; justify-content: flex-start; }
+.brand { margin: 0; display: block; line-height: 0; }
+/* 공식 wordmark: 비율 유지, filter·shadow·변형 없음 */
+.wordmark { display: block; width: var(--wordmark-w); height: auto; object-fit: contain; }
+.wordmark-dark { display: none; }
+:root[data-theme="dark"] .wordmark-light { display: none; }
+:root[data-theme="dark"] .wordmark-dark { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .wordmark-light { display: none; }
+  :root:not([data-theme]) .wordmark-dark { display: block; }
+}
+
+/* ---------- Photo + info 컬럼: 사진 폭에 정보의 좌측 끝을 맞춘다 ---------- */
+.stack { width: 100%; }
+
+.photo { position: relative; border-radius: var(--r-xl); }
+.photo[data-status="loading"], .photo[data-status="error"] {
+  aspect-ratio: var(--ratio, 1.7778);
+  background: var(--photo-placeholder);
+  box-shadow: 0 0 0 1px var(--photo-border);
+}
+.photo-img {
+  display: block;
+  width: 100%; height: auto;
+  max-height: var(--photo-max-h);
+  object-fit: contain;
+  border-radius: var(--r-xl);
+  box-shadow: 0 0 0 1px var(--photo-border);  /* 1px 헤어라인, 그림자 아님 */
+  /* 사진은 테마와 무관: filter · blend · overlay · opacity 조정 금지 */
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease);
+  -webkit-touch-callout: default;            /* iOS 길게 누르기 메뉴 명시적 허용 */
+}
+.photo[data-status="loaded"] .photo-img { opacity: 1; }
+.photo[data-status="loading"] .photo-img { position: absolute; inset: 0; height: 100%; }
+
+.photo-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s-12);
+  font-size: 14px; color: var(--placeholder-text);
+}
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--text-tertiary); animation: dot 1s var(--ease) infinite; }
+.dots i:nth-child(2) { animation-delay: 0.16s; }
+.dots i:nth-child(3) { animation-delay: 0.32s; }
+@keyframes dot { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+.photo-error {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: var(--s-16); text-align: center;
+  animation: fade var(--dur-base) var(--ease) both;
+}
+.photo-error-title { font-size: 17px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--text-primary); }
+.photo-error-desc { margin-top: var(--s-4); font-size: 15px; line-height: 1.5; color: var(--placeholder-text); }
+.btn-primary {
+  margin-top: var(--s-20);
+  height: 48px; min-width: 120px; padding: 0 var(--s-24);
+  border: 0; border-radius: var(--r-btn);
+  background: var(--accent-primary); color: var(--on-accent);
+  font: inherit; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease);
+  touch-action: manipulation;
+}
+.btn-primary:active { background: var(--accent-pressed); }
+@media (hover: hover) { .btn-primary:hover { background: var(--accent-pressed); } }
+
+/* ---------- 정보 ---------- */
+.info { margin-top: var(--photo-gap); animation: fade var(--dur-base) var(--ease) both; }
+
+.expiry-label { font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--expiry-label); }
+.expiry-value {
+  margin-top: var(--s-6);
+  font-size: 20px; font-weight: 700; line-height: 1.3; letter-spacing: -0.015em;
+  color: var(--text-primary); font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  margin-top: var(--s-16);
+  font-size: 15px; font-weight: 400; line-height: 1.5; color: var(--hint-text);
+  animation: fade var(--dur-base) var(--ease) both;
+}
+.hint-mouse { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .hint-touch { display: none; }
+  .hint-mouse { display: inline; }
+}
+
+
+/* ---------- 만료 결과 화면 ---------- */
+.result {
+  flex: 1; min-height: 60vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 0 var(--s-8) 14vh;
+  animation: fade var(--dur-base) var(--ease) both;
+}
+.result-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--result-icon-bg); color: var(--text-tertiary);
+}
+.result-title { margin-top: var(--s-24); font-size: 22px; font-weight: 700; line-height: 1.35; letter-spacing: -0.015em; color: var(--text-primary); }
+.result-desc { margin-top: var(--s-8); font-size: 15px; line-height: 1.6; color: var(--text-tertiary); }
+
+@keyframes fade { from { opacity: 0; } }
+
+/* =========================================================
+   Dev (prototype only) — production UI 와 분리
+   ========================================================= */
+.dev {
+  position: fixed; z-index: 50;
+  right: max(var(--s-12), env(safe-area-inset-right, 0px));
+  bottom: calc(var(--s-12) + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-8);
+}
+.dev-toggle {
+  height: 36px; min-width: 48px; padding: 0 var(--s-12); border-radius: var(--r-m);
+  border: 1px solid var(--border-default); background: var(--page-bg); color: var(--text-tertiary);
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-float);
+}
+.dev-panel {
+  width: 268px; padding: var(--s-12) var(--s-12) var(--s-16);
+  background: var(--page-bg); border: 1px solid var(--border-default); border-radius: var(--r-l);
+  box-shadow: var(--shadow-float);
+}
+.dev-legend { margin: var(--s-12) 0 6px; font-size: 12px; font-weight: 600; color: var(--text-tertiary); }
+.dev-legend:first-child { margin-top: 0; }
+.segmented { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--segment-track); }
+.segment {
+  flex: 1 1 0; min-width: 0; height: 30px; padding: 0 6px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--text-tertiary);
+  font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap;
+}
+.segment[aria-pressed="true"] { background: var(--segment-thumb); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow-float); }
+.segment-icon { display: inline-flex; }
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-img, .btn-primary { transition: none; }
+  .info, .hint, .result, .photo-error { animation: none; }
+  .dots i { animation: none; opacity: 0.6; }
+}
